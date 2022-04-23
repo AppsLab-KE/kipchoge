@@ -1,0 +1,14 @@
+openapi: '3.0.2'
+info:
+  title: Kipchoge Jokes API by Apps:Lab
+  version: '1.0'
+servers:
+  - url: https://api.server.test/v1
+paths:
+  /ping:
+    description: monitor
+    get:
+      description: Confirm if API is running
+      responses:
+        '200':
+          description: OK

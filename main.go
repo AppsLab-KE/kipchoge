@@ -1,3 +1,22 @@
+//Kipchoge API
+//
+//This is a simple kipchoge keino jokes API for learning purpose
+//
+//Schemes: http
+//
+//License: MIT
+//
+//Host: localhost:9001
+//BasePath: /
+//Version: 1.0.0
+//Contact: Marvin Collins <marvin@appslab.co.ke> https://appslab.co.ke
+//
+//Consumes: 
+//- application/json
+//
+//Produces:
+//- application/json
+//swagger:meta
 package main
 
 import (

@@ -1,0 +1,20 @@
+basePath: /
+consumes:
+- application/json
+host: localhost:9001
+info:
+  contact:
+    email: marvin@appslab.co.ke
+    name: Marvin Collins
+    url: https://appslab.co.ke
+  description: This is a simple kipchoge keino jokes API for learning purpose
+  license:
+    name: MIT
+  title: Kipchoge API
+  version: 1.0.0
+paths: {}
+produces:
+- application/json
+schemes:
+- http
+swagger: "2.0"
