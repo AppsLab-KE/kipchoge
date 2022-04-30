@@ -9,8 +9,7 @@ func Router() *gin.Engine {
 	r := gin.Default()
 	//Apis
 	jokes := r.Group("/jokes")
-
-		jokes.GET("/categories", handlers.GetJokeCategories)
+	jokes.GET("/categories", handlers.GetJokeCategories)
 
 	return r
 }
