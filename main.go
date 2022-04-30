@@ -1,25 +1,7 @@
-//Kipchoge API
-//
-//This is a simple kipchoge keino jokes API for learning purpose
-//
-//Schemes: http
-//
-//License: MIT
-//
-//Host: localhost:9001
-//BasePath: /
-//Version: 1.0.0
-//Contact: Marvin Collins <marvin@appslab.co.ke> https://appslab.co.ke
-//
-//Consumes: 
-//- application/json
-//
-//Produces:
-//- application/json
-//swagger:meta
 package main
 
 import (
+	"appslab-ke/kipchoge-go/internal/storage"
 	"appslab-ke/kipchoge-go/pkg/routes"
 	"context"
 	"log"
@@ -31,10 +13,27 @@ import (
 )
 
 func main() {
+	dbClient, err := storage.NewStorage()
+	if err != nil {
+		log.Fatalf("failed to connect to dbClient %v", err)
+	}
+
+	err = dbClient.Ping()
+	if err != nil {
+		log.Printf("fail to ping database %v", err)
+	}
+
+	defer func(db storage.Storage) {
+		err := db.Defer()
+		if err != nil {
+			log.Fatalln("failed to close connection")
+		}
+	}(dbClient)
+
 	handler := routes.Router()
 	port := ":" + os.Getenv("PORT")
 	srv := &http.Server{
-		Addr: port,
+		Addr:    port,
 		Handler: handler,
 	}
 

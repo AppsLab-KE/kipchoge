@@ -1,20 +1,512 @@
-basePath: /
-consumes:
-- application/json
-host: localhost:9001
+openapi: 3.0.3
 info:
-  contact:
-    email: marvin@appslab.co.ke
-    name: Marvin Collins
-    url: https://appslab.co.ke
-  description: This is a simple kipchoge keino jokes API for learning purpose
-  license:
-    name: MIT
-  title: Kipchoge API
+  title: Scaratec Invoice & Payment API
+  description: Scaratec Invoice & Payment API
   version: 1.0.0
-paths: {}
-produces:
-- application/json
-schemes:
-- http
-swagger: "2.0"
+  termsOfService: https://pay.scaratec.com/api
+  contact:
+    name: Scaratec
+    email: gupta@scaratec.com
+    url: https://scaratec.com
+servers:
+  - url: 'http://localhost:9005'
+paths:
+  /ping:
+    get:
+      summary: Check if the server is running
+      security: [ ] # no security
+      description: Check if the api is live Return pong
+      operationId: ping
+      responses:
+        '200':
+          description: Server is up
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/Pong'
+                    type: object
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /entities/{emailId}/email:
+    get:
+      summary: get business entity by email
+      tags:
+        - getBusinessEntityByEmail
+      security: [ ]
+      operationId: getBusinessEntityByEmail
+      parameters:
+        - name: emailId
+          in: path
+          description: Email of entity
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Get business entity by email response
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/BusinessEntity'
+        default:
+          description: an error occured
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - properties:
+                      error:
+                        default: true
+                        type: boolean
+
+  /entities:
+    get:
+      summary: get business entities
+      tags:
+        - businessEntities
+      security: [ ]
+      operationId: listEntities
+      parameters:
+        - name: limit
+          in: query
+          description: list of entities
+          required: true
+          schema:
+            type: number
+        - name: offset
+          in: query
+          description: entities list offset
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: entity list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/BusinessContactResp'
+                type: object
+        default:
+          description: an error occured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+    post:
+      summary: create a new business entity
+      tags:
+        - businessEntity
+      security: [ ]
+      operationId: businessEntity
+      requestBody:
+        description: create business entity
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessEntity'
+      responses:
+        '201':
+          description: business entity created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        default:
+          description: an error occured
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - properties:
+                      error:
+                        default: true
+                        type: boolean
+  /contacts:
+    get:
+      summary: get business contacts
+      tags:
+        - contacts
+      security:
+        - bearerAuth: [ ]
+      operationId: listContacts
+      parameters:
+        - name: limit
+          in: query
+          description: list of contacts
+          required: true
+          schema:
+            type: number
+        - name: offset
+          in: query
+          description: contact list offset
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: contact list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/BusinessContactResp'
+                type: object
+        default:
+          description: an error occured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+    post:
+      summary: create a new business contact
+      tags:
+        - contacts
+      security:
+        - bearerAuth: [ ]
+      operationId: createContact
+      requestBody:
+        description: 'create business contact'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessContact'
+      responses:
+        '201':
+          description: Contact created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        default:
+          description: an error occured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /invoice-recipients:
+    post:
+      summary: create business invoice recipient
+      tags:
+        - invoiceRecipient
+      operationId: createInvoiceRecipient
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        description: 'create business contact invoice recipient'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceRecipient'
+      responses:
+        '201':
+          description: Invoice recipient created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        default:
+          description: error message occured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /invoices:
+    get:
+      summary: get business invoice
+      tags:
+        - invoice
+      security:
+        - bearerAuth: [ ]
+      operationId: invoiceList
+      parameters:
+        - name: limit
+          in: query
+          description: list of invoice
+          required: true
+          schema:
+            type: number
+        - name: offset
+          in: query
+          description: contact list offset
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: invoice list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/InvoiceResp'
+                type: object
+        default:
+          description: an error occured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+    post:
+      summary: create a new invoice
+      tags:
+        - createInvoice
+      security: [ ]
+      operationId: createInvoice
+      requestBody:
+        description: 'create invoice'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Invoice'
+      responses:
+        '201':
+          description: Invoice created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        default:
+          description: an error occured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Pong:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+    Response:
+      type: object
+      required:
+        - status
+        - data
+        - message
+        - error
+      properties:
+        status:
+          type: integer
+        data:
+          oneOf:
+            - type: object
+            - type: array
+        message:
+          type: string
+        error:
+          default: false
+          type: boolean
+    BusinessEntity:
+      type: object
+      required:
+        - name
+        - email
+        - country
+        - city
+        - line1
+        - postal_code
+        - phone_number
+        - state
+      properties:
+        id:
+          type: string
+          description: business entity id
+        name:
+          type: string
+          description: business name
+        email:
+          type: string
+          description: business email
+        country:
+          type: string
+          description: business country use ISO country code
+        city:
+          type: string
+          description: business city
+        line1:
+          description: business first address
+          type: string
+        postal_code:
+          description: business postal code/address
+          type: string
+        phone_number:
+          description: business phone number
+          type: string
+        organisation_ref:
+          description: optional - this is clipshyphony organisation id
+          type: string
+        line2:
+          description: optional business second address
+          type: string
+        state:
+          type: string
+          description: business state or province
+    BusinessContact:
+      type: object
+      required:
+        - given_name
+        - family_name
+        - gender
+        - email
+      properties:
+        given_name:
+          type: string
+        family_name:
+          type: string
+        gender:
+          type: string
+        email:
+          type: string
+        id:
+          type: string
+    Invoice:
+      type: object
+      required:
+        - customer_id
+        - billing_entity_id #business contact id
+        - is_recurring
+        - start_date
+        - due_date
+      properties:
+        id:
+          type: string
+        invoice_number:
+          type: string
+        description:
+          type: string
+        customer_id:
+          type: string
+        billing_entity_id:
+          type: string
+        sub_total:
+          type: number
+        is_recurring:
+          type: string
+        currency:
+          type: string
+        tax_amount:
+          type: number
+        total_amount:
+          type: number
+        amount_paid:
+          type: number
+        balance:
+          type: number
+        start_date:
+          type: string
+          format: date
+          example: "2022-01-30"
+        due_date:
+          type: string
+          format: date
+          example: "2022-01-30"
+        pdf_path:
+          type: string
+        status:
+          type: string
+    InvoiceRecipient:
+      type: object
+      required:
+        - company_name
+        - contact_id
+        - email
+        - is_company
+        - address1
+        - address2
+        - zip
+        - city
+        - country
+        - billing_contact
+        - vat_id
+        - source_of_business
+      properties:
+        company_name:
+          type: string
+        id:
+          type: string
+        email:
+          type: string
+        is_company:
+          type: boolean
+        address1:
+          type: string
+        address2:
+          type: string
+        zip:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        billing_contact:
+          type: string
+        vat_id:
+          type: string
+        source_of_business:
+          type: string
+        contact_id:
+          type: string
+    BusinessContactResp:
+      type: object
+      properties:
+        business_contacts:
+          description: list on business contacts
+          type: array
+          items:
+            minItems: 20
+            maxItems: 20
+            allOf:
+              - $ref: '#/components/schemas/BusinessContact'
+      required:
+        - business_contacts
+    InvoiceResp:
+      type: object
+      properties:
+        invoices:
+          description: list of invoices
+          type: array
+          minItems: 20
+          maxItems: 20
+          items:
+            allOf:
+              - $ref: '#/components/schemas/Invoice'
+      required:
+        - invoices
