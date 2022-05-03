@@ -6,7 +6,8 @@ import (
 )
 
 type Server struct {
-	db storage.Storage
+	db    storage.Storage
+	cache *storage.Cache
 }
 
 func NewApp() *gin.Engine {

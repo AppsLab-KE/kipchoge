@@ -30,6 +30,13 @@ func main() {
 		}
 	}(dbClient)
 
+	cache, err := storage.NewCache()
+	if err != nil {
+		log.Fatalln("failed to connect to redis")
+	}
+
+	cache.Ping()
+
 	handler := handlers.NewApp()
 	port := ":" + os.Getenv("PORT")
 	srv := &http.Server{
