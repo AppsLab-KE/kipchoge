@@ -2,7 +2,7 @@ package main
 
 import (
 	"appslab-ke/kipchoge-go/internal/storage"
-	"appslab-ke/kipchoge-go/pkg/routes"
+	"appslab-ke/kipchoge-go/pkg/handlers"
 	"context"
 	"log"
 	"net/http"
@@ -30,7 +30,14 @@ func main() {
 		}
 	}(dbClient)
 
-	handler := routes.Router()
+	cache, err := storage.NewCache()
+	if err != nil {
+		log.Fatalln("failed to connect to redis")
+	}
+
+	cache.Ping()
+
+	handler := handlers.NewApp()
 	port := ":" + os.Getenv("PORT")
 	srv := &http.Server{
 		Addr:    port,

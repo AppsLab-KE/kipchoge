@@ -2,26 +2,19 @@ package configs
 
 import (
 	"errors"
+	"github.com/go-redis/redis/v8"
 	"os"
 )
 
-type AppConfig struct {
-	DbType string
-}
-
 const selectedDb = "mongo"
-
-func NewAppConfig() {
-
-}
 
 func GetDbConfig() string {
 	var dbUri string
 	switch selectedDb {
 	case "mongo":
 		{
-			mongoUri := os.Getenv("MONGO_URI")
-			if mongoUri == "" {
+			mongoUri, ok := os.LookupEnv("MONGO_URI")
+			if !ok {
 				panic(errors.New("mongo uri not defined in env"))
 			}
 			dbUri = mongoUri
@@ -31,4 +24,20 @@ func GetDbConfig() string {
 	}
 
 	return dbUri
+}
+
+func GetRedisConfig() *redis.Options {
+	redisAddr, ok := os.LookupEnv("REDIS_ADDRESS")
+	if !ok {
+		panic(errors.New("redis address not defined in env"))
+		return nil
+	}
+
+	redisPassword := os.Getenv("REDIS_PASSWORD")
+
+	return &redis.Options{
+		Addr:     redisAddr,
+		Password: redisPassword,
+		DB:       0,
+	}
 }
